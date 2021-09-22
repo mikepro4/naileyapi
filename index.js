@@ -56,6 +56,7 @@ require("./models/Site");
 require("./models/Theme");
 require("./routes/main")(app);
 require("./routes/SiteRoutes")(app);
+require("./routes/ThemeRoutes")(app);
 
 const PORT = process.env.PORT || 5001;
 const server = app.listen(PORT);

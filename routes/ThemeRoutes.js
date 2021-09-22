@@ -1,6 +1,5 @@
 const _ = require("lodash");
 const mongoose = require("mongoose");
-const Sites = mongoose.model("site");
 const Themes = mongoose.model("theme");
 const request = require('request-promise');
 
@@ -8,16 +7,16 @@ module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/sites/search", async (req, res) => {
+	app.post("/themes/search", async (req, res) => {
         const { criteria, sortProperty, offset, limit, order } = req.body;
         
-		const query = Sites.find(buildQuery(criteria))
+		const query = Themes.find(buildQuery(criteria))
 			.sort({ [sortProperty]: order })
 			.skip(offset)
 			.limit(limit);
 
 		return Promise.all(
-			[query, Sites.find(buildQuery(criteria)).countDocuments()]
+			[query, Themes.find(buildQuery(criteria)).countDocuments()]
 		).then(
 			results => {
 				return res.json({
@@ -32,20 +31,20 @@ module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/sites/create", async (req, res) => {
-		const Site = await new Sites({
+	app.post("/themes/create", async (req, res) => {
+		const Theme = await new Themes({
 			createdAt: new Date(),
             metadata: req.body.metadata,
 		}).save();
-		res.json(Site);
+		res.json(Theme);
 	});
 
 	// ===========================================================================
 
-	app.post("/sites/update", async (req, res) => {
-		Sites.update(
+	app.post("/themes/update", async (req, res) => {
+		Themes.update(
 			{
-				_id: req.body.siteId
+				_id: req.body.themeId
 			},
 			{
 				$set: { 
@@ -56,9 +55,9 @@ module.exports = app => {
 			async (err, info) => {
 				if (err) res.status(400).send({ error: "true", error: err });
 				if (info) {
-					Sites.findOne({ _id: req.body.siteId }, async (err, Site) => {
-						if (Site) {
-							res.json({ success: "true", info: info, site: Site });
+					Themes.findOne({ _id: req.body.themeId }, async (err, Theme) => {
+						if (Theme) {
+							res.json({ success: "true", info: info, theme: Theme });
 						}
 					});
 				}
@@ -68,8 +67,8 @@ module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/sites/delete", async (req, res) => {
-		Sites.remove({ _id: req.body.siteId }, async (err) => {
+	app.post("/themes/delete", async (req, res) => {
+		Themes.remove({ _id: req.body.themeId }, async (err) => {
 			if (err) return res.send(err);
 			res.json({
 				success: "true",
@@ -80,8 +79,8 @@ module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/sites/item", async (req, res) => {
-		Sites.findOne({ _id: req.body.siteId }, async (err, Shape) => {
+	app.post("/themes/item", async (req, res) => {
+		Themes.findOne({ _id: req.body.themeId }, async (err, Shape) => {
 			if (Shape) {
 				res.json(Shape);
 			}
@@ -90,27 +89,20 @@ module.exports = app => {
 
     // ===========================================================================
 
-	app.post("/sites/main", async (req, res) => {
+	app.post("/themes/main", async (req, res) => {
         
-        const query = Sites.find({ "metadata.main": true })
-			.sort({ "metadata.mainDate": -1 })
-			.skip(0)
-            .limit(1);
-
-        const query2 = Themes.find({ "metadata.main": true })
+        const query = Themes.find({ "metadata.main": true })
 			.sort({ "metadata.mainDate": -1 })
 			.skip(0)
             .limit(1);
             
             return Promise.all(
-                [query, Sites.find().countDocuments(), Themes.find().countDocuments(), query2]
+                [query, Themes.find().countDocuments()]
             ).then(
                 results => {
                     return res.json({
                         main: results[0][0],
-                        count: results[1],
-                        themeCount: results[2],
-                        theme: results[3][0]
+                        count: results[1]
                     })
                 }
             );
@@ -118,12 +110,12 @@ module.exports = app => {
     
     // ===========================================================================
 
-	app.post("/sites/setMain", async (req, res) => {
-        Sites.findOne({ "metadata.main": true }, async (err, site) => {
-			if (site) {
-                Sites.update(
+	app.post("/themes/setMain", async (req, res) => {
+        Themes.findOne({ "metadata.main": true }, async (err, theme) => {
+			if (theme) {
+                Themes.update(
                     {
-                        _id: site._id
+                        _id: theme._id
                     },
                     {
                         $set: { 
@@ -133,9 +125,9 @@ module.exports = app => {
                     async (err, info) => {
                         if (err) res.status(400).send({ error: "true", error: err });
                         if (info) {
-                            Sites.update(
+                            Themes.update(
                                 {
-                                    _id: req.body.site._id
+                                    _id: req.body.theme._id
                                 },
                                 {
                                     $set: { 
@@ -153,9 +145,9 @@ module.exports = app => {
                     }
                 );
 			} else {
-                Sites.update(
+                Themes.update(
                     {
-                        _id: req.body.site._id
+                        _id: req.body.theme._id
                     },
                     {
                         $set: { 

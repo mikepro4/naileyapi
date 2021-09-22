@@ -2,14 +2,16 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const themeSchema = new Schema({
-    title: String,
-    textColor: String,
-    backgroundColor: String,
-    buttonType: String,
-    gradientStart: String,
-    gradientEnd: String,
-    imageEffect: String,
-    active: { type: Date, default: false },
+    createdAt: { type: Date, default: Date.now },
+    status: String,
+    metadata: {
+        createdBy: String,
+        main: { type: Boolean, default: false },
+        mainDate: { type: Date, default: Date.now },
+        title: String,
+        subtitle: String,
+        description: String,
+    }
 });
 
 mongoose.model("theme", themeSchema);
