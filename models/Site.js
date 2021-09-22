@@ -3,7 +3,6 @@ const { Schema } = mongoose;
 
 const siteSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
-    status: String,
     metadata: {
         createdBy: String,
         main: { type: Boolean, default: false },

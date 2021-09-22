@@ -54,9 +54,15 @@ app.post('/signup', Authentication.signup);
 
 require("./models/Site");
 require("./models/Theme");
+require("./models/Font");
+require("./models/Product");
+require("./models/Section");
 require("./routes/main")(app);
 require("./routes/SiteRoutes")(app);
 require("./routes/ThemeRoutes")(app);
+require("./routes/FontRoutes")(app);
+require("./routes/ProductRoutes")(app);
+require("./routes/SectionRoutes")(app);
 
 const PORT = process.env.PORT || 5001;
 const server = app.listen(PORT);
