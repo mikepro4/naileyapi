@@ -97,10 +97,13 @@ module.exports = app => {
             .limit(1);
             
             return Promise.all(
-                [query]
+                [query, Sites.find().countDocuments()]
             ).then(
                 results => {
-                    return res.json(results[0][0]);
+                    return res.json({
+                        main: results[0][0],
+                        count: results[1]
+                    })
                 }
             );
     });
@@ -168,12 +171,7 @@ const buildQuery = criteria => {
 	const query = {};
 
 	if (criteria.createdBy) {
-		_.assign(query, {
-			"metadata.createdBy": {
-				$regex: new RegExp(criteria.createdBy),
-				$options: "i"
-			}
-		});
+		
 	}
 
 	return query
