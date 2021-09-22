@@ -52,7 +52,10 @@ app.get('/', function(req, res) {
 app.post('/signin', requireSignin, Authentication.signin);
 app.post('/signup', Authentication.signup);
 
+require("./models/Site");
+require("./models/Theme");
 require("./routes/main")(app);
+require("./routes/SiteRoutes")(app);
 
 const PORT = process.env.PORT || 5001;
 const server = app.listen(PORT);
