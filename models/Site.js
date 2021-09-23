@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const siteSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     metadata: {
+        projectId: String,
         createdBy: String,
         main: { type: Boolean, default: false },
         mainDate: { type: Date, default: Date.now },

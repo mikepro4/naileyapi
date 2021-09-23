@@ -2,6 +2,7 @@ const _ = require("lodash");
 const mongoose = require("mongoose");
 const Sites = mongoose.model("site");
 const Themes = mongoose.model("theme");
+const Projects = mongoose.model("project");
 const request = require('request-promise');
 
 module.exports = app => {
@@ -113,35 +114,95 @@ module.exports = app => {
 	app.post("/sites/main", async (req, res) => {
 
         console.log(req.body.domain)
-        
-        const query = Sites.find({ "metadata.main": true })
-			.sort({ "metadata.mainDate": -1 })
-			.skip(0)
-            .limit(1);
 
-        const query2 = Themes.find({ "metadata.main": true })
-			.sort({ "metadata.mainDate": -1 })
-			.skip(0)
-            .limit(1);
-            
+        Projects.findOne({ "metadata.domain": req.body.domain }, async (err, project) => {
+            let criteria = {}
+
+            if(project) {
+                criteria = { "metadata.main": true, "metadata.projectId": project._id }
+            } else {
+                criteria = { "metadata.main": true}
+            }
+
+            const query = Sites.find(criteria)
+                .sort({ "metadata.mainDate": -1 })
+                .skip(0)
+                .limit(1);
+
+            const query2 = Themes.find({ "metadata.main": true })
+                .sort({ "metadata.mainDate": -1 })
+                .skip(0)
+                .limit(1);
+
+            const query3 =  Projects.find({ "metadata.main": true })
+                .sort({ "metadata.mainDate": -1 })
+                .skip(0)
+                .limit(1);
+
             return Promise.all(
-                [query, Sites.find().countDocuments(), Themes.find().countDocuments(), query2]
+                [query, Sites.find({"metadata.projectId": req.body.projectId }).countDocuments(), Themes.find().countDocuments(), query2, query3]
             ).then(
                 results => {
                     return res.json({
                         main: results[0][0],
                         count: results[1],
                         themeCount: results[2],
-                        theme: results[3][0]
+                        theme: results[3][0],
+                        project: results[4][0]
                     })
                 }
             );
+
+        })
+
+        // Sites.find({ "metadata.main": true }, async (err, site) => {
+        //     if(site) {
+        //             const query2 = Themes.find({ "metadata.main": true })
+        //                 .sort({ "metadata.mainDate": -1 })
+        //                 .skip(0)
+        //                 .limit(1);
+
+        //             const query3 =  Projects.find({ "_id": site.metadata.projectId })
+        //                 .sort({ "metadata.mainDate": -1 })
+        //                 .skip(0)
+        //                 .limit(1);
+        //     }
+        // })
+        
+        // const query = Sites.find({ "metadata.main": true })
+		// 	.sort({ "metadata.mainDate": -1 })
+		// 	.skip(0)
+        //     .limit(1);
+
+    //     const query2 = Themes.find({ "metadata.main": true })
+	// 		.sort({ "metadata.mainDate": -1 })
+	// 		.skip(0)
+    //         .limit(1);
+
+    //     const query3 =  Projects.find({ "metadata.main": true })
+    //         .sort({ "metadata.mainDate": -1 })
+	// 		.skip(0)
+    //         .limit(1);
+            
+    //     return Promise.all(
+    //         [query, Sites.find().countDocuments(), Themes.find().countDocuments(), query2, query3]
+    //     ).then(
+    //         results => {
+    //             return res.json({
+    //                 main: results[0][0],
+    //                 count: results[1],
+    //                 themeCount: results[2],
+    //                 theme: results[3][0],
+    //                 project: results[4][0]
+    //             })
+    //         }
+    //     );
     });
     
     // ===========================================================================
 
 	app.post("/sites/setMain", async (req, res) => {
-        Sites.findOne({ "metadata.main": true }, async (err, site) => {
+        Sites.findOne({ "metadata.main": true, "metadata.projectId": req.body.projectId}, async (err, site) => {
 			if (site) {
                 Sites.update(
                     {
@@ -207,6 +268,15 @@ const buildQuery = criteria => {
 				$options: "i"
 			}
 		});
-	}
+    }
+    
+    if (criteria.projectId) {
+		_.assign(query, {
+			"metadata.projectId": {
+				$eq: criteria.projectId
+			}
+		});
+    }
+    
 	return query
 };
