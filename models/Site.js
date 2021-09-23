@@ -7,12 +7,15 @@ const siteSchema = new Schema({
         createdBy: String,
         main: { type: Boolean, default: false },
         mainDate: { type: Date, default: Date.now },
+        status: String,
         title: String,
+        color: String,
         subtitle: String,
         description: String,
         socialMediaImage: "",
         ctaText: String,
         ctaUrl: String,
+        theme: Object,
         pages: [
             {
                 title: String,

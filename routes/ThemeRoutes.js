@@ -5,6 +5,24 @@ const request = require('request-promise');
 
 module.exports = app => {
 
+    app.post("/themes/all", async (req, res) => {
+
+        const query = Themes.find({
+            "metadata.title": {
+				$regex: new RegExp(req.body.title),
+				$options: "i"
+			}
+        })
+
+		return Promise.all(
+			[query, Themes.countDocuments()]
+		).then(
+			results => {
+				return res.json(results[0]);
+			}
+		);
+	});
+
 	// ===========================================================================
 
 	app.post("/themes/search", async (req, res) => {

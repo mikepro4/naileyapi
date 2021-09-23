@@ -6,6 +6,26 @@ const request = require('request-promise');
 
 module.exports = app => {
 
+    // ===========================================================================
+
+	app.post("/sites/all", async (req, res) => {
+        
+		const query = Sites.find({
+            "metadata.title": {
+				$regex: new RegExp(req.body.title),
+				$options: "i"
+			}
+        })
+
+		return Promise.all(
+			[query, Sites.countDocuments()]
+		).then(
+			results => {
+				return res.json(results[0]);
+			}
+		);
+	});
+
 	// ===========================================================================
 
 	app.post("/sites/search", async (req, res) => {
@@ -178,9 +198,13 @@ module.exports = app => {
 const buildQuery = criteria => {
 	const query = {};
 
-	if (criteria.createdBy) {
-		
+    if (criteria.createdBy) {
+		_.assign(query, {
+			"metadata.createdBy": {
+				$regex: new RegExp(criteria.createdBy),
+				$options: "i"
+			}
+		});
 	}
-
 	return query
 };
