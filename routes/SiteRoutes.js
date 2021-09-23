@@ -111,6 +111,8 @@ module.exports = app => {
     // ===========================================================================
 
 	app.post("/sites/main", async (req, res) => {
+
+        console.log(req.body.domain)
         
         const query = Sites.find({ "metadata.main": true })
 			.sort({ "metadata.mainDate": -1 })

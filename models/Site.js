@@ -16,6 +16,12 @@ const siteSchema = new Schema({
         ctaText: String,
         ctaUrl: String,
         theme: Object,
+        logoType: String,
+        logoText: String,
+        logoUrl: String,
+        logoAutoSize: { type: Boolean, default: true },
+        logoHeight: Number,
+        logoWidth: Number,
         pages: [
             {
                 title: String,
