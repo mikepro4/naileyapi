@@ -125,8 +125,6 @@ module.exports = app => {
                 criteria = { "metadata.main": true}
             }
 
-            let criteria = {}
-
             if(project) {
                 projectCriteria = { "_id": project._id }
             } else {
