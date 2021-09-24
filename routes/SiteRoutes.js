@@ -117,11 +117,20 @@ module.exports = app => {
 
         Projects.findOne({ "metadata.domain": req.body.domain }, async (err, project) => {
             let criteria = {}
+            let projectCriteria = {}
 
             if(project) {
                 criteria = { "metadata.main": true, "metadata.projectId": project._id }
             } else {
                 criteria = { "metadata.main": true}
+            }
+
+            let criteria = {}
+
+            if(project) {
+                projectCriteria = { "_id": project._id }
+            } else {
+                projectCriteria = { "metadata.main": true}
             }
 
             const query = Sites.find(criteria)
@@ -134,7 +143,7 @@ module.exports = app => {
                 .skip(0)
                 .limit(1);
 
-            const query3 =  Projects.find({ "metadata.main": true })
+            const query3 =  Projects.find(projectCriteria)
                 .sort({ "metadata.mainDate": -1 })
                 .skip(0)
                 .limit(1);
