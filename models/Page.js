@@ -11,6 +11,7 @@ const pageSchema = new Schema({
         url: String,
         sections: [Object],
         siteId: String,
+        home: {type: Boolean, default: false}
     }
 });
 
