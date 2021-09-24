@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const Pages = mongoose.model("page");
+const Sites = mongoose.model("site");
 const request = require('request-promise');
 
 module.exports = app => {
@@ -53,8 +54,29 @@ module.exports = app => {
 		const Page = await new Pages({
 			createdAt: new Date(),
             metadata: req.body.metadata,
-		}).save();
-		res.json(Page);
+        }).save();
+        
+        if(Page) {
+            Sites.update(
+                {
+                    _id: Page.metadata.siteId
+                },
+                {
+                    $push: {
+                        "metadata.pages": {
+                            pageId: Page._id
+                        }
+                    }
+                },
+                async (err, result) => {
+                    if (result) {
+                        res.json(Page);
+                    } else if (err) {
+                        res.send(err);
+                    }
+                }
+            );
+        }
 	});
 
 	// ===========================================================================
@@ -87,11 +109,32 @@ module.exports = app => {
 
 	app.post("/pages/delete", async (req, res) => {
 		Pages.remove({ _id: req.body.pageId }, async (err) => {
-			if (err) return res.send(err);
-			res.json({
-				success: "true",
-				message: "deleted Shape"
-			});
+            if (err) return res.send(err);
+            
+            Sites.update(
+                {
+                    _id: req.body.page.metadata.siteId
+                },
+                {
+                    $pull: {
+                        "metadata.pages": {
+                            pageId: req.body.pageId
+                        }
+                    }
+                },
+                async (err, result) => {
+                    if (result) {
+                        res.json({
+                            success: "true",
+                            message: "deleted Shape"
+                        });
+                    } else if (err) {
+                        res.send(err);
+                    }
+                }
+            );
+
+			
 		});
 	});
 
@@ -181,7 +224,21 @@ module.exports = app => {
                 );
             }
 		})
-	})
+    })
+    
+    // ===========================================================================
+
+	app.post("/pages/allSitePages", async (req, res) => {
+        
+        Pages.find({ "metadata.siteId": req.body.siteId },
+            async (err, results) => {
+                if (err) res.status(400).send({ error: "true", error: err });
+                if (results) {
+                    res.json(results)
+                }
+        })
+            
+    });
 
 };
 

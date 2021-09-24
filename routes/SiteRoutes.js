@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Sites = mongoose.model("site");
 const Themes = mongoose.model("theme");
 const Projects = mongoose.model("project");
+const Pages = mongoose.model("page");
 const request = require('request-promise');
 
 module.exports = app => {
@@ -57,8 +58,39 @@ module.exports = app => {
 		const Site = await new Sites({
 			createdAt: new Date(),
             metadata: req.body.metadata,
-		}).save();
-		res.json(Site);
+        }).save();
+        if(Site) {
+            const Page = await new Pages({
+                createdAt: new Date(),
+                "metadata.siteId": Site._id,
+                "metadata.home": true,
+                "metadata.title": "Home"
+            }).save();
+
+            if(Page) {
+                Sites.update(
+                    {
+                        _id: Site._id
+                    },
+                    {
+                        $push: {
+                            "metadata.pages": {
+                                pageId: Page._id
+                            }
+                        }
+                    },
+                    async (err, result) => {
+                        if (result) {
+                            console.log(result)
+                            res.json(result);
+                        } else if (err) {
+                            console.log(err)
+                            res.send(err);
+                        }
+                    }
+                );
+            }
+        }
 	});
 
 	// ===========================================================================

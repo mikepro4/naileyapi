@@ -24,7 +24,7 @@ const siteSchema = new Schema({
         logoHeight: Number,
         logoWidth: Number,
         logoPosition: { type: String, default: "left" },
-        mainLinks: { type: Boolean, default: false },
+        mainLinks: { type: Boolean, default: true },
         mainLinksPosition: { type: String, default: "left" },
         mainCTA:{ type: Boolean, default: false },
         mainCTAPosition: { type: String, default: "right" },
@@ -36,19 +36,7 @@ const siteSchema = new Schema({
         mainCTAWidth: {type: Number, default: 222},
         pages: [
             {
-                title: String,
-                sections: [
-                    {
-                        type: String,
-                        title: String,
-                        content: String
-                    }
-                ],
-                images: [
-                    {
-                        imageUrl: String
-                    }
-                ]
+               pageId: String
             }
         ]
     }
