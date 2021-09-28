@@ -28,7 +28,7 @@ const siteSchema = new Schema({
         mainLinksPosition: { type: String, default: "left" },
         mainCTA:{ type: Boolean, default: false },
         mainCTAPosition: { type: String, default: "right" },
-        mainCTAText: {type: String, default: "Push"},
+        mainCTAText: {type: String, default: "Push play"},
         mainCTAURL: String,
         maxWidth: {type: Number, default: 1650},
         mobileBreakpoint: {type: Number, default: 800},
