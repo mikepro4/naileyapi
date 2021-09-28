@@ -64,7 +64,7 @@ module.exports = app => {
         if(Site) {
             // db.col1.find({},{_id:0}).forEach(function(doc){db.col1.save(doc)});
             Pages.find({ "metadata.siteId" : req.body.originalId}, async (err, results) => {
-				if (results.length > 0) {
+				if (results.length > 0 && req.body.originalId) {
                     console.log("HERE")
                     req.body.metadata.pages.forEach( async(page, i) => {
                         console.log(i, req.body.metadata.pages.length - 1)
@@ -124,7 +124,8 @@ module.exports = app => {
                             {
                                 $push: {
                                     "metadata.pages": {
-                                        pageId: Page._id
+                                        pageId: Page._id,
+                                        order: 0
                                     }
                                 }
                             },
