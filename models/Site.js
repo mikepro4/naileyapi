@@ -36,7 +36,8 @@ const siteSchema = new Schema({
         mainCTAWidth: {type: Number, default: 222},
         pages: [
             {
-               pageId: String
+               pageId: String,
+               order: Number
             }
         ]
     }

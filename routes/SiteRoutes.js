@@ -134,9 +134,9 @@ module.exports = app => {
 	// ===========================================================================
 
 	app.post("/sites/item", async (req, res) => {
-		Sites.findOne({ _id: req.body.siteId }, async (err, Shape) => {
-			if (Shape) {
-				res.json(Shape);
+		Sites.findOne({ _id: req.body.siteId }, async (err, site) => {
+			if (site) {
+				res.json(site);
 			}
 		});
     });

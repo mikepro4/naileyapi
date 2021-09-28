@@ -10,10 +10,11 @@ module.exports = app => {
 
         const query = Pages.find({
             "metadata.title": {
-				$regex: new RegExp(req.body.title),
-				$options: "i"
-			}
+                $regex: new RegExp(req.body.title),
+                $options: "i"
+            }
         })
+        
 
 		return Promise.all(
 			[query, Pages.countDocuments()]
@@ -230,13 +231,27 @@ module.exports = app => {
 
 	app.post("/pages/allSitePages", async (req, res) => {
         
-        Pages.find({ "metadata.siteId": req.body.siteId },
+        Pages.find(
+            { 
+                "metadata.siteId": req.body.siteId 
+            },
             async (err, results) => {
                 if (err) res.status(400).send({ error: "true", error: err });
                 if (results) {
                     res.json(results)
                 }
         })
+
+        // const query = Pages.find({ "metadata.siteId": req.body.siteId })
+		// 	.sort({ "metadata.order": -1 })
+            
+        //     return Promise.all(
+        //         [query]
+        //     ).then(
+        //         results => {
+        //             return res.json(results[0])
+        //         }
+        //     );
             
     });
 
