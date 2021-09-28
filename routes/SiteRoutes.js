@@ -241,7 +241,7 @@ module.exports = app => {
                             themeCount: results[1],
                             theme: results[2][0],
                             project: results[3][0],
-                            pages: results[4]
+                            allPages: results[4]
                         })
                     }
                 );
