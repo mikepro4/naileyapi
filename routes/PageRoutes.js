@@ -149,9 +149,9 @@ module.exports = app => {
 	// ===========================================================================
 
 	app.post("/pages/item", async (req, res) => {
-		Pages.findOne({ _id: req.body.pageId }, async (err, Shape) => {
-			if (Shape) {
-				res.json(Shape);
+		Pages.findOne({ _id: req.body.pageId }, async (err, Page) => {
+			if (Page) {
+				res.json(Page);
 			}
 		});
     });
