@@ -109,7 +109,8 @@ module.exports = app => {
                         createdAt: new Date(),
                         "metadata.siteId": Site._id,
                         "metadata.home": true,
-                        "metadata.title": "Home"
+                        "metadata.title": "Home",
+                        "metadata.url": "/"
                     }).save();
         
                     if(Page) {
