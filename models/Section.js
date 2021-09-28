@@ -6,6 +6,12 @@ const sectionSchema = new Schema({
     metadata: {
         createdBy: String,
         title: String,
+        fields: [
+            {
+                fieldType: String,
+                properties: [Object]
+            }],
+        sectionType: String
     }
 });
 
