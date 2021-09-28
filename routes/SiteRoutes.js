@@ -56,7 +56,6 @@ module.exports = app => {
 	// ===========================================================================
 
 	app.post("/sites/create", async (req, res) => {
-        console.log(req.body.metadata)
 		const Site = await new Sites({
 			createdAt: new Date(),
             metadata: req.body.metadata,
@@ -65,9 +64,7 @@ module.exports = app => {
             // db.col1.find({},{_id:0}).forEach(function(doc){db.col1.save(doc)});
             Pages.find({ "metadata.siteId" : req.body.originalId}, async (err, results) => {
 				if (results.length > 0 && req.body.originalId) {
-                    console.log("HERE")
                     req.body.metadata.pages.forEach( async(page, i) => {
-                        console.log(i, req.body.metadata.pages.length - 1)
 
                         Pages.findOne({
                             _id: page.pageId
@@ -94,7 +91,6 @@ module.exports = app => {
                                     async (err, result) => {
                                         if (result) {
                                             if(i == (req.body.metadata.pages.length - 1)) {
-                                                console.log("finished")
                                                 res.json("ok")
                                             }
                                         } else if (err) {
