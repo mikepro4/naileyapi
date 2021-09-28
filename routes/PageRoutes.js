@@ -58,25 +58,32 @@ module.exports = app => {
         }).save();
         
         if(Page) {
-            Sites.update(
-                {
-                    _id: Page.metadata.siteId
-                },
-                {
-                    $push: {
-                        "metadata.pages": {
-                            pageId: Page._id
+            Pages.find({ "metadata.siteId": Page.metadata.siteId }, async (err, results) => {
+                if (results) {
+                    console.log(req.body.pagesCount)
+                    Sites.update(
+                        {
+                            _id: Page.metadata.siteId
+                        },
+                        {
+                            $push: {
+                                "metadata.pages": {
+                                    pageId: Page._id,
+                                    order: req.body.pagesCount
+                                }
+                            }
+                        },
+                        async (err, result) => {
+                            if (result) {
+                                res.json(result);
+                            } else if (err) {
+                                res.send(err);
+                            }
                         }
-                    }
-                },
-                async (err, result) => {
-                    if (result) {
-                        res.json(Page);
-                    } else if (err) {
-                        res.send(err);
-                    }
+                    );
                 }
-            );
+            });
+            
         }
 	});
 

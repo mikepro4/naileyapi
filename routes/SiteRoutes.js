@@ -5,6 +5,7 @@ const Themes = mongoose.model("theme");
 const Projects = mongoose.model("project");
 const Pages = mongoose.model("page");
 const request = require('request-promise');
+const { pagespeedonline } = require("googleapis/build/src/apis/pagespeedonline");
 
 module.exports = app => {
 
@@ -55,41 +56,93 @@ module.exports = app => {
 	// ===========================================================================
 
 	app.post("/sites/create", async (req, res) => {
+        console.log(req.body.metadata)
 		const Site = await new Sites({
 			createdAt: new Date(),
             metadata: req.body.metadata,
         }).save();
         if(Site) {
-            const Page = await new Pages({
-                createdAt: new Date(),
-                "metadata.siteId": Site._id,
-                "metadata.home": true,
-                "metadata.title": "Home"
-            }).save();
+            // db.col1.find({},{_id:0}).forEach(function(doc){db.col1.save(doc)});
+            Pages.find({ "metadata.siteId" : req.body.originalId}, async (err, results) => {
+				if (results.length > 0) {
+                    console.log("HERE")
+                    req.body.metadata.pages.forEach( async(page, i) => {
+                        console.log(i, req.body.metadata.pages.length - 1)
 
-            if(Page) {
-                Sites.update(
-                    {
-                        _id: Site._id
-                    },
-                    {
-                        $push: {
-                            "metadata.pages": {
-                                pageId: Page._id
+                        Pages.findOne({
+                            _id: page.pageId
+                        }, async(err, existingPage) => {
+
+                            const NewPage = await new Pages({
+                                createdAt: new Date(),
+                                metadata: {
+                                    ...existingPage.metadata,
+                                    siteId: Site._id,
+                                },
+                            }).save();
+
+                            if(NewPage) {
+                                Sites.update(
+                                    {
+                                        _id: Site._id
+                                    },
+                                    {  $set: { "metadata.pages.$[element].pageId": NewPage._id }},
+                                    {
+                                        multi: true,
+                                        arrayFilters: [ { "element.order": { $eq: i } } ]
+                                    },
+                                    async (err, result) => {
+                                        if (result) {
+                                            if(i == (req.body.metadata.pages.length - 1)) {
+                                                console.log("finished")
+                                                res.json("ok")
+                                            }
+                                        } else if (err) {
+                                            // console.log(err)
+                                            // res.send(err);
+                                        }
+                                    }
+                                );
                             }
-                        }
-                    },
-                    async (err, result) => {
-                        if (result) {
-                            console.log(result)
-                            res.json(result);
-                        } else if (err) {
-                            console.log(err)
-                            res.send(err);
-                        }
+                        })
+
+                    })
+                    
+				} else {
+                    const Page = await new Pages({
+                        createdAt: new Date(),
+                        "metadata.siteId": Site._id,
+                        "metadata.home": true,
+                        "metadata.title": "Home"
+                    }).save();
+        
+                    if(Page) {
+                        Sites.update(
+                            {
+                                _id: Site._id
+                            },
+                            {
+                                $push: {
+                                    "metadata.pages": {
+                                        pageId: Page._id
+                                    }
+                                }
+                            },
+                            async (err, result) => {
+                                if (result) {
+                                    console.log(result)
+                                    res.json(result);
+                                } else if (err) {
+                                    console.log(err)
+                                    res.send(err);
+                                }
+                            }
+                        );
                     }
-                );
-            }
+                }
+            })
+            
+           
         }
 	});
 
