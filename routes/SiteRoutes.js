@@ -213,34 +213,42 @@ module.exports = app => {
                 projectCriteria = { "metadata.main": true}
             }
 
-            const query = Sites.find(criteria)
+            const Site = await Sites.find(criteria)
                 .sort({ "metadata.mainDate": -1 })
                 .skip(0)
                 .limit(1);
 
-            const query2 = Themes.find({ "metadata.main": true })
-                .sort({ "metadata.mainDate": -1 })
-                .skip(0)
-                .limit(1);
+            if(Site) {
+                const query2 = Themes.find({ "metadata.main": true })
+                    .sort({ "metadata.mainDate": -1 })
+                    .skip(0)
+                    .limit(1);
 
-            const query3 =  Projects.find(projectCriteria)
-                .sort({ "metadata.mainDate": -1 })
-                .skip(0)
-                .limit(1);
+                const query3 =  Projects.find(projectCriteria)
+                    .sort({ "metadata.mainDate": -1 })
+                    .skip(0)
+                    .limit(1);
 
-            return Promise.all(
-                [query, Sites.find({"metadata.projectId": req.body.projectId }).countDocuments(), Themes.find().countDocuments(), query2, query3]
-            ).then(
-                results => {
-                    return res.json({
-                        main: results[0][0],
-                        count: results[1],
-                        themeCount: results[2],
-                        theme: results[3][0],
-                        project: results[4][0]
-                    })
-                }
-            );
+                const query4 =  Pages.find({"metadata.siteId" : Site[0]._id})
+
+                return Promise.all(
+                    [Sites.find({"metadata.projectId": req.body.projectId }).countDocuments(), Themes.find().countDocuments(), query2, query3, query4]
+                ).then(
+                    results => {
+                        return res.json({
+                            main: Site[0],
+                            count: results[0],
+                            themeCount: results[1],
+                            theme: results[2][0],
+                            project: results[3][0],
+                            pages: results[4]
+                        })
+                    }
+                );
+            }
+
+
+            
 
         })
 
