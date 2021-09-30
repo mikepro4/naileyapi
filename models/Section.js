@@ -11,7 +11,8 @@ const sectionSchema = new Schema({
                 fieldType: String,
                 properties: [Object]
             }],
-        sectionType: String
+        sectionType: String,
+        templateName: String
     }
 });
 
